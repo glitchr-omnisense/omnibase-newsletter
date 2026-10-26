@@ -1,6 +1,6 @@
 # Newsletter
 
-A newsletter for [omnibase](https://github.com/glitchr-studio/omnibase), with
+A newsletter for [omnibase](https://github.com/glitchr-omnisense/omnibase), with
 no account behind it: the visitor leaves an address, confirms it from the mail
 it receives, and gets the letters the site writes in its back office - each
 carrying its way out. First made for two musicians' sites (a harpist, a
@@ -75,10 +75,10 @@ of the mails point at `localhost`.
 
 ## Double opt-in
 
-1. The visitor fills the form. It is guarded as omniscient/omnibase guards a
+1. The visitor fills the form. It is guarded as omnisense/omnibase guards a
    form (its option `guard`, `action: newsletter`): a trap, the time it takes
    (`min_delay`), the lists, the captcha when the site has glitchr/omnishield.
-   With a omniscient/omnibase from before the guard, the form's own trap field
+   With a omnisense/omnibase from before the guard, the form's own trap field
    (`website`) and signed timestamp (`opened_at`, an HMAC with the kernel's
    secret) do that work. Then the flood
    interval the second sign-up from one address, and the rate limiter
