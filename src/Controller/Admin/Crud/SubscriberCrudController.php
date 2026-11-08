@@ -8,6 +8,8 @@ use Base\Admin\Config\Actions;
 use Base\Admin\Controller\AbstractCrudController;
 use Base\Admin\Filter\Filter;
 use Base\Admin\Filter\Filters;
+use Base\Database\Repository\Finder\Criterion;
+use Base\Database\Repository\Finder\Parser;
 use Base\Field\DateTimeField;
 use Base\Field\IdField;
 use Base\Field\TextField;
@@ -45,12 +47,18 @@ class SubscriberCrudController extends AbstractCrudController
 
     public function configureFilters(Filters $filters): Filters
     {
-        // Not columns but states: a date set or not.
-        $isSet = fn (string $field) => fn (QueryBuilder $query, string $alias, mixed $value) => $query->andWhere(sprintf('%s.%s IS %s', $alias, $field, '1' === $value || 'true' === $value || true === $value ? 'NOT NULL' : 'NULL'));
+        // Not columns but states: a date set or not. Said in the core's finder
+        // language, which every persistence reads (matchWith()); the same on
+        // Doctrine's QueryBuilder where the list is still built on it - under
+        // omnisense/omnibase 4.x, and on SubscriberRepository, a plain Doctrine
+        // repository that reads no finder (applyWith()).
+        $yes = static fn (mixed $value): bool => '1' === $value || 'true' === $value || true === $value;
+        $isSet = static fn (string $field) => static fn (mixed $value) => Criterion::of($field, null, $yes($value) ? Parser::OPTION_NOT_NULL : Parser::OPTION_NULL);
+        $isSetOn = static fn (string $field) => static fn (QueryBuilder $query, string $alias, mixed $value) => $query->andWhere(sprintf('%s.%s IS %s', $alias, $field, $yes($value) ? 'NOT NULL' : 'NULL'));
 
         return $filters
-            ->add(Filter::new('confirmed', '@newsletter.admin.subscriber.confirmed')->asBoolean()->applyWith($isSet('confirmedAt')))
-            ->add(Filter::new('unsubscribed', '@newsletter.admin.subscriber.unsubscribed')->asBoolean()->applyWith($isSet('unsubscribedAt')))
+            ->add(Filter::new('confirmed', '@newsletter.admin.subscriber.confirmed')->asBoolean()->matchWith($isSet('confirmedAt'))->applyWith($isSetOn('confirmedAt')))
+            ->add(Filter::new('unsubscribed', '@newsletter.admin.subscriber.unsubscribed')->asBoolean()->matchWith($isSet('unsubscribedAt'))->applyWith($isSetOn('unsubscribedAt')))
             ->add('locale')
             ->add('source');
     }
