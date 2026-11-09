@@ -48,10 +48,9 @@ class SubscriberCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         // Not columns but states: a date set or not. Said in the core's finder
-        // language, which every persistence reads (matchWith()); the same on
-        // Doctrine's QueryBuilder where the list is still built on it - under
-        // omnisense/omnibase 4.x, and on SubscriberRepository, a plain Doctrine
-        // repository that reads no finder (applyWith()).
+        // language, which every persistence reads (matchWith(); SubscriberRepository
+        // reads it); the same on Doctrine's QueryBuilder where the list is still
+        // built on it, under omnisense/omnibase 4.x (applyWith()).
         $yes = static fn (mixed $value): bool => '1' === $value || 'true' === $value || true === $value;
         $isSet = static fn (string $field) => static fn (mixed $value) => Criterion::of($field, null, $yes($value) ? Parser::OPTION_NOT_NULL : Parser::OPTION_NULL);
         $isSetOn = static fn (string $field) => static fn (QueryBuilder $query, string $alias, mixed $value) => $query->andWhere(sprintf('%s.%s IS %s', $alias, $field, $yes($value) ? 'NOT NULL' : 'NULL'));

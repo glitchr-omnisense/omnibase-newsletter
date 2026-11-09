@@ -3,11 +3,15 @@
 namespace Base\Newsletter\Repository;
 
 use Base\Newsletter\Entity\Subscriber;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Omnibridge\Doctrine\Omnibase\Database\Repository\ServiceEntityRepository;
 
-/** @extends ServiceEntityRepository<Subscriber> */
+/**
+ * The subscribers, on omnibridge/doctrine's repository: it reads the core's finder language, so the back office's list
+ * and its filters (SubscriberCrudController::configureFilters(), matchWith()) are read through the finder, as on every
+ * persistence, where a plain Doctrine repository kept them on the QueryBuilder (applyWith()).
+ */
 class SubscriberRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
