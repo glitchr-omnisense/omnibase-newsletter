@@ -3,7 +3,7 @@
 A newsletter for the sites built on [omnisense/omnibase](https://github.com/glitchr-omnisense/omnibase),
 with no account behind it: the visitor leaves an address, confirms it from the mail it
 receives, and gets the letters the site writes in its back office - each carrying its way out.
-It is a Symfony bundle (`Base\Newsletter\NewsletterBundle`) on the core 3 or 4; the letters go
+It is a Symfony bundle (`Base\Newsletter\NewsletterBundle`) on omnisense/omnibase 5.1 or later; the letters go
 out through Symfony Messenger and Mailer. It was first made for two musicians' sites, where it
 is the only thing a visitor can subscribe to.
 

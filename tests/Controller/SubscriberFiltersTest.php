@@ -11,6 +11,7 @@ use Base\Newsletter\Controller\Admin\Crud\SubscriberCrudController;
 use Base\Newsletter\Entity\Subscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -42,6 +43,7 @@ final class SubscriberFiltersTest extends TestCase
     }
 
     /** @dataProvider states */
+    #[DataProvider('states')]
     public function testSaidInTheFinderLanguage(string $property, string $field): void
     {
         $filter = $this->filter($property);
@@ -55,11 +57,12 @@ final class SubscriberFiltersTest extends TestCase
     }
 
     /** @dataProvider states */
+    #[DataProvider('states')]
     public function testTheSameOnDoctrinesQueryBuilder(string $property, string $field): void
     {
         $filter = $this->filter($property);
         foreach (['1' => 'IS NOT NULL', '0' => 'IS NULL'] as $value => $condition) {
-            $queryBuilder = (new QueryBuilder($this->createMock(EntityManagerInterface::class)))->select('entity')->from(Subscriber::class, 'entity');
+            $queryBuilder = (new QueryBuilder($this->createStub(EntityManagerInterface::class)))->select('entity')->from(Subscriber::class, 'entity');
             $filter->apply($queryBuilder, 'entity', (string) $value);
             self::assertSame(sprintf('SELECT entity FROM %s entity WHERE entity.%s %s', Subscriber::class, $field, $condition), $queryBuilder->getDQL());
         }
