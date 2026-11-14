@@ -2,8 +2,8 @@
 
 namespace Base\Newsletter\DependencyInjection;
 
-use Base\Bundle\AbstractBaseExtension;
 use Base\Newsletter\Service\SubscribeGuard;
+use Omnibridge\Symfony\Omnibase\Bundle\AbstractBaseExtension;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

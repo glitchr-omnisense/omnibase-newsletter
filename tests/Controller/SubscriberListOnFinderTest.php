@@ -14,8 +14,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * The back office's list of subscribers is read through the core's finder, as on every persistence: SubscriberRepository
  * is omnibridge/doctrine's repository, which reads the finder language and is one of the core's repositories (Entities),
- * so omnibase/admin builds the list and its "confirmed" and "unsubscribed" filters with findBy() and their matchWith(),
- * where a plain Doctrine repository kept the list on Doctrine's QueryBuilder (their applyWith()).
+ * so omnibase/admin builds the list and its "confirmed" and "unsubscribed" filters with findBy() and their matchWith().
  */
 final class SubscriberListOnFinderTest extends TestCase
 {

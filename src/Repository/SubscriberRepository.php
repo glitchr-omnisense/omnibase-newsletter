@@ -10,7 +10,7 @@ use Omnibridge\Doctrine\Omnibase\Database\Repository\ServiceEntityRepository;
 /**
  * The subscribers, on omnibridge/doctrine's repository: it reads the core's finder language, so the back office's list
  * and its filters (SubscriberCrudController::configureFilters(), matchWith()) are read through the finder, as on every
- * persistence, where a plain Doctrine repository kept them on the QueryBuilder (applyWith()).
+ * persistence.
  */
 class SubscriberRepository extends ServiceEntityRepository
 {

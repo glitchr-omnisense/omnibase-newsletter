@@ -15,7 +15,6 @@ use Base\Field\IdField;
 use Base\Field\TextField;
 use Base\Newsletter\Entity\Subscriber;
 use Base\Newsletter\Repository\SubscriberRepository;
-use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -49,15 +48,13 @@ class SubscriberCrudController extends AbstractCrudController
     {
         // Not columns but states: a date set or not. Said in the core's finder
         // language, which every persistence reads (matchWith(); SubscriberRepository
-        // reads it); the same on Doctrine's QueryBuilder where the list is still
-        // built on it, under omnisense/omnibase 4.x (applyWith()).
+        // reads it).
         $yes = static fn (mixed $value): bool => '1' === $value || 'true' === $value || true === $value;
         $isSet = static fn (string $field) => static fn (mixed $value) => Criterion::of($field, null, $yes($value) ? Parser::OPTION_NOT_NULL : Parser::OPTION_NULL);
-        $isSetOn = static fn (string $field) => static fn (QueryBuilder $query, string $alias, mixed $value) => $query->andWhere(sprintf('%s.%s IS %s', $alias, $field, $yes($value) ? 'NOT NULL' : 'NULL'));
 
         return $filters
-            ->add(Filter::new('confirmed', '@newsletter.admin.subscriber.confirmed')->asBoolean()->matchWith($isSet('confirmedAt'))->applyWith($isSetOn('confirmedAt')))
-            ->add(Filter::new('unsubscribed', '@newsletter.admin.subscriber.unsubscribed')->asBoolean()->matchWith($isSet('unsubscribedAt'))->applyWith($isSetOn('unsubscribedAt')))
+            ->add(Filter::new('confirmed', '@newsletter.admin.subscriber.confirmed')->asBoolean()->matchWith($isSet('confirmedAt')))
+            ->add(Filter::new('unsubscribed', '@newsletter.admin.subscriber.unsubscribed')->asBoolean()->matchWith($isSet('unsubscribedAt')))
             ->add('locale')
             ->add('source');
     }

@@ -5,6 +5,23 @@ versions [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-11-14
+
+### Changed
+- The bundle's classes extend omnibridge/symfony's `AbstractBaseBundle`, `AbstractBaseExtension` and
+  `AbstractBaseConfiguration` by their names (`Omnibridge\Symfony\Omnibase\Bundle\*`), no longer by the former
+  `Base\Bundle\*` ones, which omnisense/omnibase keeps only as aliases until 6.0. The same classes: nothing changes for
+  an application.
+- `SubscriberCrudController`'s "confirmed" and "unsubscribed" filters say their condition with `Filter::matchWith()`
+  only: their `applyWith()` (Doctrine's QueryBuilder, deprecated by omnibase/admin since its step B1b) is gone. With
+  omnisense/omnibase 5.1 and `SubscriberRepository`, which reads the finder, the admin builds the list through the
+  finder and never called it. Only an application's controller extending `SubscriberCrudController` and overriding
+  one of the admin's deprecated QueryBuilder hooks (`createIndexQueryBuilder()`, `applySearch()`, `applyFilters()`)
+  had these two filters written on the QueryBuilder; it moves to `indexCriteria()`. `SubscriberFiltersTest` drops its
+  QueryBuilder case.
+- docs/installation.md: `config/bundles.php` registers `Omnibridge\Symfony\Omnibase\BaseBundle`, the core's
+  bundle under its name since omnisense/omnibase 5.0 (`Base\BaseBundle` is its former name).
+
 ## [1.0.0] — 2026-11-13
 
 ### Changed

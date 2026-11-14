@@ -26,13 +26,13 @@ composer require omnibase/newsletter
 // config/bundles.php
 return [
     // ...
-    Base\BaseBundle::class => ['all' => true],
+    Omnibridge\Symfony\Omnibase\BaseBundle::class => ['all' => true],
     Base\Admin\AdminBundle::class => ['all' => true],
     Base\Newsletter\NewsletterBundle::class => ['all' => true],
 ];
 ```
 
-`NewsletterBundle` extends the core's `AbstractBaseBundle`: its root is the package's
+`NewsletterBundle` extends omnibridge/symfony's `AbstractBaseBundle`: its root is the package's
 (`templates/` is `@Newsletter`, `public/` is `bundles/newsletter/`), and `build()` aliases
 `Base\Newsletter\Entity\*` to `App\Entity\Newsletter\*` and the repositories to
 `App\Repository\Newsletter\*`, unless the application declares its own class there.
