@@ -26,7 +26,7 @@ composer require omnibase/newsletter
 // config/bundles.php
 return [
     // ...
-    Omnibridge\Symfony\Omnibase\BaseBundle::class => ['all' => true],
+    Base\BaseBundle::class => ['all' => true],
     Base\Admin\AdminBundle::class => ['all' => true],
     Base\Newsletter\NewsletterBundle::class => ['all' => true],
 ];

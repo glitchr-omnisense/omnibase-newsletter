@@ -3,7 +3,7 @@
 namespace Base\Newsletter\Entity;
 
 use Base\Newsletter\Repository\SubscriberRepository;
-use Doctrine\ORM\Mapping as ORM;
+use Base\Mapping as ORM;
 
 /**
  * An address on the list - never an account. Double opt-in: it receives

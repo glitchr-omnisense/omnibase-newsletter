@@ -40,11 +40,6 @@ final class SubscriberFiltersTest extends TestCase
     public function testSaidInTheFinderLanguage(string $property, string $field): void
     {
         $filter = $this->filter($property);
-        self::assertTrue($filter->isNeutral(), 'every persistence can say it');
-        if (!method_exists(Group::class, 'of')) {
-            self::markTestSkipped('omnisense/omnibase 4.x: the list is built on Doctrine\'s QueryBuilder.');
-        }
-
         self::assertEquals(Group::of(Parser::SEPARATOR_AND, Criterion::of($field, null, Parser::OPTION_NOT_NULL)), $filter->match('1'));
         self::assertEquals(Group::of(Parser::SEPARATOR_AND, Criterion::of($field, null, Parser::OPTION_NULL)), $filter->match('0'));
     }

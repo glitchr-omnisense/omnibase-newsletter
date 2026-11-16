@@ -3,9 +3,11 @@
 namespace Base\Newsletter\Repository;
 
 use Base\Newsletter\Entity\Subscriber;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
-use Omnibridge\Doctrine\Omnibase\Database\Repository\ServiceEntityRepository;
+use Base\Database\Repository\Finder\Criterion;
+use Base\Database\Repository\Finder\Group;
+use Base\Database\Repository\Finder\Parser;
+use Base\Database\Repository\Finders;
+use Base\Database\Repository\ServiceEntityRepository;
 
 /**
  * The subscribers, on omnibridge/doctrine's repository: it reads the core's finder language, so the back office's list
@@ -14,9 +16,9 @@ use Omnibridge\Doctrine\Omnibase\Database\Repository\ServiceEntityRepository;
  */
 class SubscriberRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Finders $finders)
     {
-        parent::__construct($registry, Subscriber::class);
+        parent::__construct($finders, Subscriber::class);
     }
 
     public function findOneByEmail(string $email): ?Subscriber
@@ -37,21 +39,21 @@ class SubscriberRepository extends ServiceEntityRepository
      */
     public function findConfirmed(?string $locale = null): array
     {
-        return $this->confirmed($locale)->orderBy('s.id', 'ASC')->getQuery()->getResult();
+        return $this->findBy($this->confirmed($locale), ['id' => 'ASC']);
     }
 
     public function countConfirmed(?string $locale = null): int
     {
-        return (int) $this->confirmed($locale)->select('COUNT(s.id)')->getQuery()->getSingleScalarResult();
+        return $this->count($this->confirmed($locale));
     }
 
     /** Signed up, not confirmed yet, not gone. */
     public function countPending(): int
     {
-        return (int) $this->createQueryBuilder('s')->select('COUNT(s.id)')
-            ->andWhere('s.confirmedAt IS NULL')
-            ->andWhere('s.unsubscribedAt IS NULL')
-            ->getQuery()->getSingleScalarResult();
+        return $this->count([Group::of(Parser::SEPARATOR_AND,
+            Criterion::of('confirmedAt', null, Parser::OPTION_NULL),
+            Criterion::of('unsubscribedAt', null, Parser::OPTION_NULL),
+        )]);
     }
 
     /** @return list<Subscriber> the last ones signed up, whatever became of them */
@@ -66,15 +68,21 @@ class SubscriberRepository extends ServiceEntityRepository
         return $this->findOneBy(['ip' => $ip], ['createdAt' => 'DESC']);
     }
 
-    private function confirmed(?string $locale): QueryBuilder
+    /**
+     * Confirmed and still there, of one language when one is given.
+     *
+     * @return array<int|string, mixed>
+     */
+    private function confirmed(?string $locale): array
     {
-        $query = $this->createQueryBuilder('s')
-            ->andWhere('s.confirmedAt IS NOT NULL')
-            ->andWhere('s.unsubscribedAt IS NULL');
+        $criteria = [Group::of(Parser::SEPARATOR_AND,
+            Criterion::of('confirmedAt', null, Parser::OPTION_NOT_NULL),
+            Criterion::of('unsubscribedAt', null, Parser::OPTION_NULL),
+        )];
         if ($locale) {
-            $query->andWhere('s.locale = :locale')->setParameter('locale', mb_strtolower($locale));
+            $criteria['locale'] = mb_strtolower($locale);
         }
 
-        return $query;
+        return $criteria;
     }
 }

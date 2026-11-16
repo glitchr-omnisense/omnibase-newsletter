@@ -124,7 +124,7 @@ class CampaignCrudController extends AbstractCrudController
             return $this->redirectToIndex();
         }
         $campaign->markSending();
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
         $this->bus->dispatch(new SendCampaignMessage($campaign->getId()));
         $this->addFlash('success', $this->trans('admin.campaign.flash.sending', ['count' => $this->subscribers->countConfirmed($campaign->getLocale())]));
 

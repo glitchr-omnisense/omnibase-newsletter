@@ -8,7 +8,7 @@ use Base\Newsletter\Form\SubscribeType;
 use Base\Newsletter\Repository\SubscriberRepository;
 use Base\Newsletter\Service\NewsletterMailer;
 use Base\Newsletter\Service\SubscribeGuard;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Contract\UnitOfWork;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormInterface;
@@ -27,7 +27,7 @@ class NewsletterController extends AbstractController
 {
     public function __construct(
         private readonly SubscriberRepository $subscribers,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly UnitOfWork $unitOfWork,
         private readonly SubscribeGuard $guard,
         private readonly NewsletterMailer $mailer,
         #[Autowire('%newsletter.double_opt_in%')] private readonly bool $doubleOptIn = true,
@@ -78,13 +78,13 @@ class NewsletterController extends AbstractController
         if (!$subscriber) {
             $source = preg_replace('/[^a-z0-9_\-]/', '', mb_strtolower((string) $form->get('source')->getData())) ?: 'site';
             $subscriber = new Subscriber($email, $request->getLocale(), $source, $request->getClientIp());
-            $this->entityManager->persist($subscriber);
+            $this->unitOfWork->persist($subscriber);
         }
         $subscriber->resubscribe($this->doubleOptIn);
         if (!$this->doubleOptIn) {
             $subscriber->confirm();
         }
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
 
         // Only an address that has not confirmed gets a mail; one already on
         // the list gets nothing - and the page says the same either way.
@@ -101,7 +101,7 @@ class NewsletterController extends AbstractController
     {
         $subscriber = $this->subscribers->findOneByToken($token) ?? throw $this->createNotFoundException('No subscriber with this token.');
         $subscriber->confirm();
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
 
         return $this->render('@Newsletter/client/confirmed.html.twig', ['subscriber' => $subscriber]);
     }
@@ -120,7 +120,7 @@ class NewsletterController extends AbstractController
         if ($request->isMethod('POST')) {
             if ($subscriber) {
                 $subscriber->unsubscribe();
-                $this->entityManager->flush();
+                $this->unitOfWork->flush();
             }
 
             return $this->render('@Newsletter/client/unsubscribe.html.twig', ['done' => true, 'token' => $token]);

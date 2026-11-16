@@ -4,7 +4,7 @@ namespace Base\Newsletter\Entity;
 
 use Base\Newsletter\Enum\CampaignState;
 use Base\Newsletter\Repository\CampaignRepository;
-use Doctrine\ORM\Mapping as ORM;
+use Base\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**

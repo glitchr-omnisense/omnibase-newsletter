@@ -3,7 +3,7 @@
 namespace Base\Newsletter\Command;
 
 use Base\Newsletter\Service\DigestDrafter;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Contract\UnitOfWork;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,7 +24,7 @@ final class DraftDigestCommand extends Command
 {
     public function __construct(
         private readonly DigestDrafter $drafter,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly UnitOfWork $unitOfWork,
         #[Autowire('%newsletter.digest.enabled%')] private readonly bool $enabled = true,
         #[Autowire('%kernel.default_locale%')] private readonly string $defaultLocale = 'en',
     ) {
@@ -76,8 +76,8 @@ final class DraftDigestCommand extends Command
             return Command::SUCCESS;
         }
 
-        $this->entityManager->persist($campaign);
-        $this->entityManager->flush();
+        $this->unitOfWork->persist($campaign);
+        $this->unitOfWork->flush();
         $io->success(sprintf('Drafted "%s" (#%d): read and send it from the back office.', $campaign->getSubject(), $campaign->getId()));
 
         return Command::SUCCESS;

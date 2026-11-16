@@ -7,7 +7,7 @@ use Base\Newsletter\Message\SendCampaignMessage;
 use Base\Newsletter\Repository\CampaignRepository;
 use Base\Newsletter\Repository\SubscriberRepository;
 use Base\Newsletter\Service\NewsletterMailer;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Contract\UnitOfWork;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -30,7 +30,7 @@ final class SendCampaignHandler
         private readonly CampaignRepository $campaigns,
         private readonly SubscriberRepository $subscribers,
         private readonly NewsletterMailer $mailer,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly UnitOfWork $unitOfWork,
         private readonly LoggerInterface $logger = new NullLogger(),
     ) {
     }
@@ -56,11 +56,11 @@ final class SendCampaignHandler
                 $this->logger->warning('Newsletter "{subject}" not sent to {email}: {error}', ['subject' => $campaign->getSubject(), 'email' => $subscriber->getEmail(), 'error' => $e->getMessage()]);
             }
             if (0 === ($i + 1) % self::BATCH) {
-                $this->entityManager->flush();
+                $this->unitOfWork->flush();
             }
         }
 
         $campaign->markSent($sent);
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
     }
 }
